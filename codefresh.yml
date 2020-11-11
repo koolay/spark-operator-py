@@ -1,21 +1,30 @@
 version: '1.0'
 stages:
-- build
-- push
+  - checkout
+  - package
+  - upload    
 steps:
-  build:
+  main_clone:
+    title: Cloning main repository...
+    type: git-clone
+    repo: '${{CF_REPO_OWNER}}/${{CF_REPO_NAME}}'
+    revision: '${{CF_REVISION}}'
+    stage: checkout
+  MyAppDockerImage:
     title: Building Docker Image
     type: build
-    stage: build
+    stage: package
     image_name: spark-operator-py
-    working_directory: {{CLONE_STEP_NAME}}
-    tag: 'master'
+    working_directory: ./
+    tag: latest
     dockerfile: Dockerfile
-  push_to_dockerhu:
-    stage: 'push'
+    disable_push: true 
+  MyPushStep:
+    title: Pushing to Docker Registry
     type: push
-    title: Pushing to a registry
-    candidate: ${{build}}
-    tag: 'latest'
-    registry: dockerhub
-    image_name: koolay/spark-operator-py    
+    stage: upload
+    tag: '${{CF_BRANCH}}'
+    candidate: '${{MyAppDockerImage}}'
+    image_name: koolay/spark-operator-py #Change kkapelon to your dockerhub username
+    registry: dockerhub # Name of your integration as was defined in the Registry screen
+      
