@@ -8,7 +8,7 @@ steps:
     type: build
     stage: build
     image_name: spark-operator-py
-    working_directory: {{clone}}
+    working_directory: {{CLONE_STEP_NAME}}
     tag: 'master'
     dockerfile: Dockerfile
   push_to_dockerhu:
